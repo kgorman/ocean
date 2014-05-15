@@ -16,7 +16,6 @@ class Ocean:
     def getData(self):
 
         baseurl = "http://tidesandcurrents.noaa.gov/api/datagetter?"
-        stations = ['8454000']
         products = ['water_temperature','air_temperature','humidity']
 
         param_date = "date=latest"
