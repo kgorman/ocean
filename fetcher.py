@@ -1,6 +1,7 @@
 import requests
 import json
 import pymongo
+import datetime
 from pymongo import MongoClient
 from optparse import OptionParser
 
@@ -11,12 +12,13 @@ from optparse import OptionParser
 class Ocean:
 
     def __init__(self):
-        pass
+        self.connection = MongoClient(options.host,options.port)
+        self.database = self.connection[options.db]
+        self.database.authenticate(options.username, options.password)
 
-    def getData(self):
+    def station_fetcher(self,station_id,product_id):
 
         baseurl = "http://tidesandcurrents.noaa.gov/api/datagetter?"
-        products = ['water_temperature','air_temperature','humidity']
 
         param_date = "date=latest"
         param_time_zone = "time_zone=gmt"
@@ -24,25 +26,55 @@ class Ocean:
         param_format = "format=json"
         param_units = "units=english"
 
-        connection = MongoClient(options.host,options.port)
-        database = connection[options.db]
-        database.authenticate(options.username, options.password)
+        param_station = "station="+station_id
+        param_product = "product="+product_id
 
-        all_stations = database['stations'].find()
+        parameters = [param_product, param_station, param_date, param_time_zone, param_application, param_format, param_units]
+        param_url = "&".join(parameters)
+        url = "".join([baseurl,param_url])
+        try:
+            r = requests.get(url)
+        except Exception, e:
+            print "couldn't fetch url %s" % e
+
+        return json.loads(r.text)
+
+    def transform_data(self):
+
+        products = ['water_temperature','air_temperature','humidity','wind','visibility','air_pressure','salinity']
+
+        all_stations = self.database['stations'].find()
 
         for station in all_stations:
+
+            station_doc = {}
+            station_doc['fetch_date'] = datetime.datetime.now()
+            station_doc['station_id'] = station['-ID']
+            station_doc['products'] = []
+
             for product in products:
 
-                param_station = "station="+station["-ID"]
-                param_product = "product="+product
+                # fetch raw data
+                station_data = self.station_fetcher(station["-ID"], product)
 
-                parameters = [param_product, param_station, param_date, param_time_zone, param_application, param_format, param_units]
-                param_url = "&".join(parameters)
-                url = baseurl+param_url
-                r = requests.get(url)
-                data = json.loads(r.text)
-                if "error" not in data:
-                    database[product].save(json.loads(r.text))
+                # if it's an error code skip skip and keep processing
+                if "error" not in station_data:
+
+                    # unwind duplicate data elements, and push to top level doc
+                    if 'metadata' in station_data:
+                        for key in station_data['metadata']:
+                            station_doc[key] = station_data['metadata'][key]
+                        del station_data['metadata']
+
+                    # slight denormalization/key naming
+                    product_detail = {}
+                    product_detail['name'] = product
+                    product_detail['data'] = station_data['data']
+                    station_doc['products'].append(product_detail)
+            try:
+                self.database['ocean_data'].save(station_doc)
+            except Exception, e:
+                print "Problem inserting: %s" % e
 
 if __name__ == "__main__":
 
@@ -55,5 +87,5 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     ocean_logger = Ocean()
-    ocean_logger.getData()
+    ocean_logger.transform_data()
 
