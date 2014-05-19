@@ -14,6 +14,8 @@ NOAA has been collecting this data for 150 years. This data is open and paid for
 
 http://tidesandcurrents.noaa.gov/about.html
 
+Data is [gathered via this spec].(http://co-ops.nos.noaa.gov/publications/CO-OPS_Measurement_SpecUpdated_4.pdf)
+
 ### Installation
 
 This is a stand alone python script.  You need a MongoDB to store this data. ObjectRocket works nicely to shard things out. You will need to install the stations background metadata first.
