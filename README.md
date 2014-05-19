@@ -13,8 +13,7 @@ The data is pulled via http://tidesandcurrents.noaa.gov/api/
 NOAA has been collecting this data for 150 years. This data is open and paid for by the US Taxpayer. CO-OPS is the authoritative source for accurate, reliable, and timely water-level and current measurements that support safe and efficient maritime commerce, sound coastal management, and recreation.
 
 http://tidesandcurrents.noaa.gov/about.html
-
-Data is [gathered via this spec].(http://co-ops.nos.noaa.gov/publications/CO-OPS_Measurement_SpecUpdated_4.pdf)
+http://co-ops.nos.noaa.gov/publications/CO-OPS_Measurement_SpecUpdated_4.pdf
 
 ### Installation
 
