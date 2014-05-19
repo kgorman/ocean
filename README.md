@@ -10,6 +10,10 @@ This dataset has some nice native properties
 
 The data is pulled via http://tidesandcurrents.noaa.gov/api/
 
+NOAA has been collecting this data for 150 years. This data is open and paid for by the US Taxpayer. CO-OPS is the authoritative source for accurate, reliable, and timely water-level and current measurements that support safe and efficient maritime commerce, sound coastal management, and recreation.
+
+http://tidesandcurrents.noaa.gov/about.html
+
 ### Installation
 
 This is a stand alone python script.  You need a MongoDB to store this data. ObjectRocket works nicely to shard things out. You will need to install the stations background metadata first.
