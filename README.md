@@ -12,14 +12,18 @@ The data is pulled via http://tidesandcurrents.noaa.gov/api/
 
 ### Installation
 
-This is a stand alone python script.
+This is a stand alone python script.  You need a MongoDB to store this data. ObjectRocket works nicely to shard things out. You will need to install the stations background metadata first.
 
 Requirements:
 - requests
 - pymongo
 
-You can run this on the command line like:
+1) Setup background metadata:
+```
+echo stations.json < mongo <connect string>
+```
 
+2) Run the script via the command line like:
 ```
 python fetcher.py
 ```

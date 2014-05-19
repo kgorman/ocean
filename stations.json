@@ -13278,3 +13278,4 @@ x = [
         ]
       }
     ]
+db.stations.save(x);
