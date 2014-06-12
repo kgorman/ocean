@@ -23,9 +23,9 @@ Requirements:
 - requests
 - pymongo
 
-1) Setup background metadata:
+1) Setup background metadata using mongoimport:
 ```
-echo stations.json < mongo <connect string>
+mongoimport --host=<hostname> --port=<port> --username=<username> --password=<password> --db=<mydb> --collection=stations stations.json
 ```
 
 2) Run the script via the command line like:
@@ -105,4 +105,10 @@ A sample document looks like:
     "fetch_date" : ISODate("2014-05-19T11:35:52.414Z"),
     "id" : "8454049"
 }
+```
+
+If you would like just a dump file to play with, you can import the stations as well as the sensor data as well like this:
+```
+mongoimport --host=<hostname> --port=<port> --username=<username> --password=<password> --db=<mydb> --collection=stations stations.json
+mongoimport --host=<hostname> --port=<port> --username=<username> --password=<password> --db=<mydb> --collection=ocean_data ocean_data.json
 ```
