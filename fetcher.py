@@ -16,13 +16,13 @@ class Ocean:
         self.database = self.connection[options.db]
         self.database.authenticate(options.username, options.password)
 
-    def station_fetcher(self,station_id,product_id):
+    def noaa_data(self,station_id,product_id):
 
         baseurl = "http://tidesandcurrents.noaa.gov/api/datagetter?"
 
         param_date = "date=latest"
         param_time_zone = "time_zone=gmt"
-        param_application = "application=ports_screen"
+        param_application = "application=kennygorman"
         param_format = "format=json"
         param_units = "units=english"
 
@@ -39,7 +39,12 @@ class Ocean:
 
         return json.loads(r.text)
 
+    def to_date(self, value):
+      """ format string in format 2014-05-19 16:18 to datetime """
+      return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M")
+
     def transform_data(self):
+        """ probe API and save document into db """
 
         products = ['water_temperature','air_temperature','humidity','wind','visibility','air_pressure','salinity']
 
@@ -55,26 +60,46 @@ class Ocean:
             for product in products:
 
                 # fetch raw data
-                station_data = self.station_fetcher(station["-ID"], product)
+                station_data = self.noaa_data(station["-ID"], product)
+
+                #{u'data': [{u'f': u'0,0,0', u't': u'2014-07-12 21:00', u'v': u'1015.8'}], u'metadata': {u'lat': u'21.3067', u'lon': u'-157.8670', u'id': u'1612340', u'name': u'Honolulu'}}
 
                 # if it's an error code skip skip and keep processing
                 if "error" not in station_data:
 
-                    # unwind duplicate data elements, and push to top level doc
+                    product_detail = {}
+
+                    # metadata items belong to the station
                     if 'metadata' in station_data:
                         for key in station_data['metadata']:
                             station_doc[key] = station_data['metadata'][key]
                         del station_data['metadata']
 
+                    # data items belong to a product
+                    if 'data' in station_data:
+                        for key in station_data['data'][0]:
+                            if key == 'v':
+                                product_detail[key] = float(station_data['data'][0][key])
+                            elif key == 't':
+                                product_detail[key] = self.to_date(station_data['data'][0][key])
+                            else:
+                                product_detail[key] = station_data['data'][0][key]
+
                     # slight denormalization/key naming
-                    product_detail = {}
                     product_detail['name'] = product
-                    product_detail['data'] = station_data['data']
                     station_doc['products'].append(product_detail)
-            try:
-                self.database['ocean_data'].save(station_doc)
-            except Exception, e:
-                print "Problem inserting: %s" % e
+
+                    station_doc['id'] = int(station_doc['id'])
+                    station_doc['station_id'] = int(station_doc['station_id'])
+                    # geo is in the form: { loc: { type: "Point", coordinates: [ 40, 5 ] } }
+                    station_doc['loc'] = {"type":"Point", "coordinates": [float(station_doc['lon`'], float(station_doc['lat']]}
+
+            if len(station_doc['products']) > 0:
+                try:
+                    self.database['ocean_data'].save(station_doc)
+                    #print station_doc
+                except Exception, e:
+                    print "Problem inserting: %s" % e
 
 if __name__ == "__main__":
 
@@ -88,4 +113,3 @@ if __name__ == "__main__":
 
     ocean_logger = Ocean()
     ocean_logger.transform_data()
-
