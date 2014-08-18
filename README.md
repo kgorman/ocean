@@ -25,6 +25,7 @@ Requirements:
 
 1) Setup background metadata using mongoimport:
 ```
+gunzip stations.json.gz
 mongoimport --host=<hostname> --port=<port> --username=<username> --password=<password> --db=<mydb> --collection=stations stations.json
 ```
 
@@ -42,73 +43,53 @@ A sample document looks like:
 
 ```
 {
-    "_id" : ObjectId("537a32e9d211f0061b91c9b1"),
-    "station_id" : "8454049",
-    "name" : "Quonset Point",
-    "lon" : "-71.4110",
-    "products" : [
-        {
-            "data" : [
-                {
-                    "f" : "0,0,0",
-                    "t" : "2014-05-19 16:30",
-                    "v" : "57.6"
-                }
-            ],
-            "name" : "water_temperature"
-        },
-        {
-            "data" : [
-                {
-                    "f" : "0,0,0",
-                    "t" : "2014-05-19 16:30",
-                    "v" : "62.8"
-                }
-            ],
-            "name" : "air_temperature"
-        },
-        {
-            "data" : [
-                {
-                    "d" : "317.00",
-                    "g" : "14.97",
-                    "f" : "0,0",
-                    "s" : "11.66",
-                    "t" : "2014-05-19 16:30",
-                    "dr" : "NW"
-                }
-            ],
-            "name" : "wind"
-        },
-        {
-            "data" : [
-                {
-                    "f" : "0,0,0",
-                    "t" : "2014-05-19 16:30",
-                    "v" : "1017.2"
-                }
-            ],
-            "name" : "air_pressure"
-        },
-        {
-            "data" : [
-                {
-                    "s" : "27.30",
-                    "t" : "2014-05-19 16:30",
-                    "g" : "1.021"
-                }
-            ],
-            "name" : "salinity"
-        }
-    ],
-    "lat" : "41.5868",
-    "fetch_date" : ISODate("2014-05-19T11:35:52.414Z"),
-    "id" : "8454049"
+	"_id" : ObjectId("53e4fcc42239c23dce3cb7bc"),
+	"station_id" : 8461490,
+	"loc" : {
+		"type" : "Point",
+		"coordinates" : [
+			-72.09,
+			41.3614
+		]
+	},
+	"name" : "New London",
+	"products" : [
+		{
+			"v" : 69.4,
+			"t" : ISODate("2014-08-08T16:24:00Z"),
+			"name" : "water_temperature",
+			"f" : "0,0,0"
+		},
+		{
+			"v" : 77,
+			"t" : ISODate("2014-08-08T16:24:00Z"),
+			"name" : "air_temperature",
+			"f" : "0,0,0"
+		},
+		{
+			"d" : "360.00",
+			"g" : "8.75",
+			"f" : "0,0",
+			"s" : "4.08",
+			"t" : ISODate("2014-08-08T16:24:00Z"),
+			"dr" : "N",
+			"name" : "wind"
+		},
+		{
+			"v" : 1015.8,
+			"t" : ISODate("2014-08-08T16:24:00Z"),
+			"name" : "air_pressure",
+			"f" : "0,0,0"
+		}
+	],
+	"fetch_date" : ISODate("2014-08-08T16:37:22.640Z"),
+	"id" : 8461490
 }
 ```
 
 If you would like just a dump file to play with, you can import the stations as well as the sensor data as well like this:
 ```
+gunzip *.gz
 mongoimport --host=<hostname> --port=<port> --username=<username> --password=<password> --db=<mydb> --collection=stations stations.json
 mongoimport --host=<hostname> --port=<port> --username=<username> --password=<password> --db=<mydb> --collection=ocean_data ocean_data.json
 ```
