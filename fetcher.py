@@ -91,13 +91,17 @@ class Ocean:
 
                     station_doc['id'] = int(station_doc['id'])
                     station_doc['station_id'] = int(station_doc['station_id'])
-                    # geo is in the form: { loc: { type: "Point", coordinates: [ 40, 5 ] } }
-                    station_doc['loc'] = {"type":"Point", "coordinates": [float(station_doc['lon`'], float(station_doc['lat']]}
+                    # geo is in the form: { loc: { type: "Point", coordinates: [ 40, 5 ] } } (lon/lat)
+                    geo_array = []
+                    geo_array.append(float(station_doc['lon']))
+                    geo_array.append(float(station_doc['lat']))
+                    station_doc['loc'] = {"type":"Point", "coordinates": geo_array }
+                    del station_doc['lon']
+                    del station_doc['lat']
 
             if len(station_doc['products']) > 0:
                 try:
                     self.database['ocean_data'].save(station_doc)
-                    #print station_doc
                 except Exception, e:
                     print "Problem inserting: %s" % e
 
