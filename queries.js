@@ -105,7 +105,7 @@ db.ocean_data.aggregate(
            num: 5,
            spherical: true
         }},
-        { $unwind : "$products" },
+        { $unwind : "$products" },m
         { $match: {"products.name":"water_temperature"}},
         {
           $project: {

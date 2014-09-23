@@ -1,5 +1,7 @@
 import pymongo
+import bson
 from pymongo import MongoClient
+import datetime
 
 """
 {
@@ -35,23 +37,42 @@ from pymongo import MongoClient
 }
 """
 
-
 client = MongoClient("iad-mongos0.objectrocket.com", 15136)
 
 db = client['ocean']
 db.authenticate('kg','kg')
-collection = db['testme']
+collection = db['ocean_data']
 
-def convert_to_float(doc):
+def to_float(value):
+  return float(value)
+
+def to_int(value):
+  return int(value)
+
+def to_date(value):
+  """ format string in format 2014-05-19 16:18 to datetime """
+  return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M")
+
+def fix_datatypes(doc):
+  doc['id'] = to_int(doc['id'])
+  doc['lat'] = to_float(doc['lat'])
+  doc['lon'] = to_float(doc['lon'])
   for p in doc['products']:
-    index = 0
     for d in p['data']:
       if 'v'in d:
-        index += 1
-        value = float(d['v'])
-        d['v'] = value
+        d['v'] = to_float(d['v'])
+      if 't' in d and d['t'] != None and type(d['t']) == "String":
+        d['t'] = to_date(d['t'])
+        print d['t']
+
   return doc
 
 for doc in collection.find():
-  print convert_to_float(doc)
-  collection.save(convert_to_float(doc))
+
+  if len(doc['products']) > 0:
+    collection.save(fix_datatypes(doc))
+    print {"ok":1}
+  else:
+    print doc['products']
+    o = bson.ObjectId(doc['_id'])
+    collection.remove({"_id":o})
