@@ -105,7 +105,7 @@ class Ocean:
 
             if len(station_doc['products']) > 0:
                 try:
-                    for doc in self.amplify(station_doc, 5):
+                    for doc in self.amplify(station_doc, options.amplify_factor):
                         #import pprint
                         #pprint.pprint(doc)
                         self.database['ocean_data'].update_one(
@@ -176,6 +176,7 @@ if __name__ == "__main__":
     parser.add_option("--db",dest="db",help="Database to connect to", default="ocean")
     parser.add_option("--username",dest="username",help="username")
     parser.add_option("--password",dest="password",help="password")
+    parser.add_option("--amplify",dest="amplify_factor",type="int",help="Write amplify factor (default: disabled)", default=1)
     (options, args) = parser.parse_args()
 
     ocean_logger = Ocean()
