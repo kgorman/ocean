@@ -4,6 +4,9 @@ import pymongo
 import datetime
 from pymongo import MongoClient
 from optparse import OptionParser
+from random import randint, uniform
+from dateutil.parser import parse
+
 
 # example url:
 # "http://tidesandcurrents.noaa.gov/api/datagetter?begin_date=20130808 15:00&end_date=20130808 15:06&
@@ -102,9 +105,68 @@ class Ocean:
 
             if len(station_doc['products']) > 0:
                 try:
-                    self.database['ocean_data'].save(station_doc)
+                    for doc in self.amplify(station_doc, 5):
+                        #import pprint
+                        #pprint.pprint(doc)
+                        self.database['ocean_data'].update_one(
+                            {'station_id':doc['station_id'], 'fetch_date':doc['fetch_date']},
+                            {'$set':doc},
+                            upsert=True
+                        )
                 except Exception, e:
                     print "Problem inserting: %s" % e
+
+    def rand_choice(self):
+        choice = randint(0, 1)
+        if choice == 1:
+            return True
+        return False
+    
+    def mutate_ts(self, ts, sec_max=300):
+        rand = randint(1, sec_max)
+        if self.rand_choice():
+            return ts + datetime.timedelta(seconds=rand)
+        else:
+            return ts - datetime.timedelta(seconds=rand)
+    
+    def mutate(self, data):
+        if isinstance(data, dict):
+            ret = {}
+            for key in data.keys():
+                ts_keys   = ['t', 'fetch_date']
+                skip_keys = ['id', 'loc', 'name', 'station_id']
+                if key in ts_keys:
+                    ret[key] = self.mutate_ts(data[key])
+                elif key in skip_keys:
+                    ret[key] = data[key]
+                else:
+                    ret[key] = self.mutate(data[key])
+            return ret
+        elif isinstance(data, list):
+            ret = []
+            for item in data:
+                ret.append(self.mutate(item))
+            return ret
+        elif isinstance(data, (int,long)):
+            rand = randint(1, 8)
+            if self.rand_choice():
+                return data + rand
+            return data - rand
+        elif isinstance(data, float):
+            rand = uniform(1.001, 1.6)
+            if self.rand_choice():
+                return data + rand
+            return data - rand
+        else:
+            return data
+    
+    def amplify(self, data, num_times=1):
+        count = 0
+        report_data = [data]
+        while count < num_times:
+            report_data.append(self.mutate(data))
+            count += 1
+        return report_data 
 
 if __name__ == "__main__":
 
