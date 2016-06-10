@@ -105,8 +105,6 @@ class Ocean:
             if len(station_doc['products']) > 0:
                 try:
                     for doc in self.amplify(station_doc, options.amplify_factor):
-                        #import pprint
-                        #pprint.pprint(doc)
                         self.database['ocean_data'].update_one(
                             {'station_id':doc['station_id'], 'fetch_date':doc['fetch_date']},
                             {'$set':doc},
@@ -127,8 +125,7 @@ class Ocean:
         rand = randint(1, sec_max)
         if self.rand_choice():
             return ts + datetime.timedelta(seconds=rand)
-        else:
-            return ts - datetime.timedelta(seconds=rand)
+        return ts - datetime.timedelta(seconds=rand)
     
     def mutate(self, data):
         if isinstance(data, dict):
@@ -154,7 +151,7 @@ class Ocean:
                 return data + rand
             return data - rand
         elif isinstance(data, float):
-            rand = uniform(1.001, 1.6)
+            rand = uniform(1.001, 1.35)
             if self.rand_choice():
                 return data + rand
             return data - rand
