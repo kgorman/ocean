@@ -112,6 +112,8 @@ class Ocean:
                             {'$set':doc},
                             upsert=True
                         )
+                    if options.verbose:
+                        print "%i docs written/updated for station: %s" % (options.amplify_factor, station_doc['name'])
                 except Exception, e:
                     print "Problem inserting: %s" % e
 
@@ -168,6 +170,7 @@ class Ocean:
 if __name__ == "__main__":
 
     parser = OptionParser()
+    parser.add_option("--verbose", dest="verbose",help="verbose mode", action="store_true", default=False)
     parser.add_option("--hostname", dest="host",help="mongodb hostname to connect to")
     parser.add_option("--port",dest="port",type=int,help="mongodb port to connect to")
     parser.add_option("--db",dest="db",help="Database to connect to", default="ocean")
