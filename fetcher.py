@@ -5,7 +5,6 @@ import datetime
 from pymongo import MongoClient
 from optparse import OptionParser
 from random import randint, uniform
-from dateutil.parser import parse
 
 
 # example url:
