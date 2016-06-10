@@ -52,11 +52,11 @@ class Ocean:
             return True
         return False
     
-    def mutate_ts(self, ts, sec_max=300):
-        rand = randint(1, sec_max)
+    def mutate_ts(self, ts, microsec_max=180 * 1000000):
+        rand = randint(500000, microsec_max)
         if self.rand_choice():
-            return ts + datetime.timedelta(seconds=rand)
-        return ts - datetime.timedelta(seconds=rand)
+            return ts + datetime.timedelta(microseconds=rand)
+        return ts - datetime.timedelta(microseconds=rand)
     
     def mutate(self, data):
         if isinstance(data, dict):
@@ -135,7 +135,9 @@ class Ocean:
                             elif key == 't':
                                 product_detail[key] = self.to_date(station_data['data'][0][key])
                             elif key == 'f':
-                                product_detail[key] = station_data['data'][0][key].split(",")
+                                product_detail[key] = []
+                                for val in station_data['data'][0][key].split(","):
+                                    product_detail[key].append(int(val))
                             else:
                                 product_detail[key] = station_data['data'][0][key]
 
