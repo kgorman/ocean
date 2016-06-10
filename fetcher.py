@@ -159,12 +159,10 @@ class Ocean:
         else:
             return data
     
-    def amplify(self, data, num_times=1):
-        count = 0
+    def amplify(self, data, amplify_factor=1):
         report_data = [data]
-        while count < num_times:
+        while len(report_data) < amplify_factor:
             report_data.append(self.mutate(data))
-            count += 1
         return report_data 
 
 if __name__ == "__main__":
