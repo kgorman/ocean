@@ -43,14 +43,12 @@ def mutate(data):
         rand = random.randint(1, 8)
         if rand_choice():
             return data + rand
-        else:
-            return data - rand
+        return data - rand
     elif isinstance(data, float):
         rand = random.uniform(1.001, 1.6)
         if rand_choice():
             return data + rand
-        else:
-            return data - rand
+        return data - rand
     else:
         return data
 
@@ -62,8 +60,12 @@ def amplify(data, num_times=1):
         count += 1
     return report_data 
 
-f = open("mutate-test.json")
-data = json.loads(f.read())
+try:
+    f = open("mutate-test.json")
+    data = json.loads(f.read())
+except Exception, e:
+    print "FAILED: %s" % e
+    raise e
 
 # tests:
 #print amplify("test")
