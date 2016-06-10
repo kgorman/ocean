@@ -77,7 +77,7 @@ class Ocean:
                 ret.append(self.mutate(item))
             return ret
         elif isinstance(data, (int,long)):
-            rand = randint(1, 8)
+            rand = randint(1, 5)
             if self.rand_choice():
                 return data + rand
             return data - rand
@@ -130,7 +130,7 @@ class Ocean:
                     # data items belong to a product
                     if 'data' in station_data:
                         for key in station_data['data'][0]:
-                            if key == 'v':
+                            if key in ['d','g','s','v']:
                                 product_detail[key] = float(station_data['data'][0][key])
                             elif key == 't':
                                 product_detail[key] = self.to_date(station_data['data'][0][key])
@@ -155,8 +155,8 @@ class Ocean:
                 try:
                     for doc in self.amplify(station_doc, options.amplify_factor):
                         self.database['ocean_data'].update_one(
-                            {'station_id':doc['station_id'], 'fetch_date':doc['fetch_date']},
-                            {'$set':doc},
+                            {'station_id': doc['station_id'], 'fetch_date': doc['fetch_date']},
+                            {'$set': doc},
                             upsert=True
                         )
                     if options.verbose:
