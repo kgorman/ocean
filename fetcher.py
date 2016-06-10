@@ -46,6 +46,55 @@ class Ocean:
       """ format string in format 2014-05-19 16:18 to datetime """
       return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M")
 
+    def rand_choice(self):
+        choice = randint(0, 1)
+        if choice == 1:
+            return True
+        return False
+    
+    def mutate_ts(self, ts, sec_max=300):
+        rand = randint(1, sec_max)
+        if self.rand_choice():
+            return ts + datetime.timedelta(seconds=rand)
+        return ts - datetime.timedelta(seconds=rand)
+    
+    def mutate(self, data):
+        if isinstance(data, dict):
+            ret = {}
+            for key in data.keys():
+                ts_keys   = ['t', 'fetch_date']
+                skip_keys = ['id', 'loc', 'name', 'station_id']
+                if key in ts_keys:
+                    ret[key] = self.mutate_ts(data[key])
+                elif key in skip_keys:
+                    ret[key] = data[key]
+                else:
+                    ret[key] = self.mutate(data[key])
+            return ret
+        elif isinstance(data, list):
+            ret = []
+            for item in data:
+                ret.append(self.mutate(item))
+            return ret
+        elif isinstance(data, (int,long)):
+            rand = randint(1, 8)
+            if self.rand_choice():
+                return data + rand
+            return data - rand
+        elif isinstance(data, float):
+            rand = uniform(1.001, 1.35)
+            if self.rand_choice():
+                return data + rand
+            return data - rand
+        else:
+            return data
+    
+    def amplify(self, data, amplify_factor=1):
+        report_data = [data]
+        while len(report_data) < amplify_factor:
+            report_data.append(self.mutate(data))
+        return report_data 
+
     def transform_data(self):
         """ probe API and save document into db """
 
@@ -114,55 +163,6 @@ class Ocean:
                         print "%i docs written/updated for station: %s" % (options.amplify_factor, station_doc['name'])
                 except Exception, e:
                     print "Problem inserting: %s" % e
-
-    def rand_choice(self):
-        choice = randint(0, 1)
-        if choice == 1:
-            return True
-        return False
-    
-    def mutate_ts(self, ts, sec_max=300):
-        rand = randint(1, sec_max)
-        if self.rand_choice():
-            return ts + datetime.timedelta(seconds=rand)
-        return ts - datetime.timedelta(seconds=rand)
-    
-    def mutate(self, data):
-        if isinstance(data, dict):
-            ret = {}
-            for key in data.keys():
-                ts_keys   = ['t', 'fetch_date']
-                skip_keys = ['id', 'loc', 'name', 'station_id']
-                if key in ts_keys:
-                    ret[key] = self.mutate_ts(data[key])
-                elif key in skip_keys:
-                    ret[key] = data[key]
-                else:
-                    ret[key] = self.mutate(data[key])
-            return ret
-        elif isinstance(data, list):
-            ret = []
-            for item in data:
-                ret.append(self.mutate(item))
-            return ret
-        elif isinstance(data, (int,long)):
-            rand = randint(1, 8)
-            if self.rand_choice():
-                return data + rand
-            return data - rand
-        elif isinstance(data, float):
-            rand = uniform(1.001, 1.35)
-            if self.rand_choice():
-                return data + rand
-            return data - rand
-        else:
-            return data
-    
-    def amplify(self, data, amplify_factor=1):
-        report_data = [data]
-        while len(report_data) < amplify_factor:
-            report_data.append(self.mutate(data))
-        return report_data 
 
 if __name__ == "__main__":
 
