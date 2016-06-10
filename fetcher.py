@@ -134,6 +134,8 @@ class Ocean:
                                 product_detail[key] = float(station_data['data'][0][key])
                             elif key == 't':
                                 product_detail[key] = self.to_date(station_data['data'][0][key])
+                            elif key == 'f':
+                                product_detail[key] = station_data['data'][0][key].split(",")
                             else:
                                 product_detail[key] = station_data['data'][0][key]
 
