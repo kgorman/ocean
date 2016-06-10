@@ -62,12 +62,12 @@ class Ocean:
         if isinstance(data, dict):
             ret = {}
             for key in data.keys():
-                ts_keys   = ['t', 'fetch_date']
                 skip_keys = ['id', 'loc', 'name', 'station_id']
-                if key in ts_keys:
-                    ret[key] = self.mutate_ts(data[key])
-                elif key in skip_keys:
+                ts_keys   = ['t', 'fetch_date']
+                if key in skip_keys:
                     ret[key] = data[key]
+                elif key in ts_keys:
+                    ret[key] = self.mutate_ts(data[key])
                 else:
                     ret[key] = self.mutate(data[key])
             return ret
