@@ -17,7 +17,7 @@ class Ocean:
         self.connection = MongoClient(options.host,options.port)
         self.database = self.connection[options.db]
         if options.username and options.password:
-            self.database.authenticate(options.username, options.password)
+            self.database.authenticate(options.username, options.password, source='admin')
 
     def noaa_data(self,station_id,product_id):
 
