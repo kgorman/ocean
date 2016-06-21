@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import requests
 import json
 import pymongo
@@ -17,7 +19,7 @@ class Ocean:
         self.connection = MongoClient(options.host,options.port)
         self.database = self.connection[options.db]
         if options.username and options.password:
-            self.database.authenticate(options.username, options.password, source='admin')
+            self.database.authenticate(options.username, options.password, source=options.authdb)
 
     def noaa_data(self,station_id,product_id):
 
@@ -175,6 +177,7 @@ if __name__ == "__main__":
     parser.add_option("--hostname", dest="host",help="mongodb hostname to connect to")
     parser.add_option("--port",dest="port",type=int,help="mongodb port to connect to")
     parser.add_option("--db",dest="db",help="Database to connect to", default="ocean")
+    parser.add_option("--authdb",dest="authdb",help="Database to use when authenticating", default="admin")
     parser.add_option("--username",dest="username",help="username")
     parser.add_option("--password",dest="password",help="password")
     parser.add_option("--amplify",dest="amplify_factor",type="int",help="Write amplify factor (default: disabled)", default=1)
