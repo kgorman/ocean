@@ -160,11 +160,7 @@ class Ocean:
             if len(station_doc['products']) > 0:
                 try:
                     for doc in self.amplify(station_doc, options.amplify_factor):
-                        self.database['ocean_data'].update_one(
-                            {'station_id': doc['station_id'], 'fetch_date': doc['fetch_date']},
-                            {'$set': doc},
-                            upsert=True
-                        )
+                        self.database['ocean_data'].insert_one(doc)
                     if options.verbose:
                         print "%i docs written/updated for station: %s" % (options.amplify_factor, station_doc['name'])
                 except Exception, e:
